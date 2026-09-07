@@ -52,8 +52,8 @@ jobs:
           Icon=lzdoom
           Categories=Game;
           EOF
-          # Icono placeholder mínimo requerido por linuxdeploy
-          touch AppDir/lzdoom.png
+          # Generar un ícono PNG válido (cuadrado sólido simple, 256x256)
+          convert -size 256x256 xc:"#8B0000" AppDir/lzdoom.png
           ./linuxdeploy-x86_64.AppImage --appdir AppDir \
             --executable AppDir/usr/bin/lzdoom \
             --desktop-file AppDir/lzdoom.desktop \
