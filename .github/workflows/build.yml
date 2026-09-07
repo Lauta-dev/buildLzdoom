@@ -1,17 +1,22 @@
-name: Build LZDoom
+name: Build LZDoom (Arch container)
 on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
     steps:
-      - name: Install dependencies
+      - name: Update system and install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y g++ make cmake libsdl2-dev git zlib1g-dev \
-            libbz2-dev libjpeg-dev libfluidsynth-dev libgme-dev libopenal-dev \
-            libmpg123-dev libsndfile1-dev libwildmidi-dev libgtk-3-dev \
-            timidity nasm tar chrpath libvpx-dev libwebp-dev
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm --needed \
+            base-devel cmake git \
+            sdl2 zlib bzip2 libjpeg-turbo \
+            fluidsynth game-music-emu openal \
+            libsndfile wildmidi gtk3 \
+            nasm libvpx libwebp \
+            mesa
 
       - name: Clone and build ZMusic
         run: |
@@ -19,8 +24,8 @@ jobs:
           mkdir ZMusic/build && cd ZMusic/build
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . -j$(nproc)
-          sudo make install
-          sudo ldconfig
+          make install
+          ldconfig
 
       - name: Checkout LZDoom
         uses: actions/checkout@v4
@@ -37,5 +42,5 @@ jobs:
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: lzdoom-linux
+          name: lzdoom-arch
           path: build/lzdoom
