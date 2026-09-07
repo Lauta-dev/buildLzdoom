@@ -5,26 +5,28 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: drfrag666/lzdoom
-          submodules: recursive
-
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ libsdl2-dev libjpeg-dev \
-            libbz2-dev zlib1g-dev libgtk-3-dev libfluidsynth-dev \
-            libgl1-mesa-dev libopenal-dev libsndfile1-dev libmpg123-dev libgme-dev
+          sudo apt-get install -y g++ make cmake libsdl2-dev git zlib1g-dev \
+            libbz2-dev libjpeg-dev libfluidsynth-dev libgme-dev libopenal-dev \
+            libmpg123-dev libsndfile1-dev libwildmidi-dev libgtk-3-dev \
+            timidity nasm tar chrpath
 
-      - name: Build and install ZMusic
+      - name: Clone and build ZMusic
         run: |
-          cd libraries/ZMusic || cd zmusic
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
+          git clone https://github.com/ZDoom/ZMusic.git
+          mkdir ZMusic/build && cd ZMusic/build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . -j$(nproc)
           sudo make install
           sudo ldconfig
+
+      - name: Checkout LZDoom
+        uses: actions/checkout@v4
+        with:
+          repository: drfrag666/lzdoom
+          submodules: recursive
 
       - name: Build LZDoom
         run: |
