@@ -1,0 +1,30 @@
+name: Build LZDoom
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: drfrag666/lzdoom
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libsdl2-dev libjpeg-dev \
+            libbz2-dev zlib1g-dev libgtk-3-dev libfluidsynth-dev \
+            libgl1-mesa-dev libopenal-dev
+
+      - name: Build
+        run: |
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc)
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: lzdoom-linux
+          path: build/lzdoom
