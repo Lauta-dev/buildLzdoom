@@ -15,9 +15,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ libsdl2-dev libjpeg-dev \
             libbz2-dev zlib1g-dev libgtk-3-dev libfluidsynth-dev \
-            libgl1-mesa-dev libopenal-dev
+            libgl1-mesa-dev libopenal-dev libsndfile1-dev libmpg123-dev libgme-dev
 
-      - name: Build
+      - name: Build and install ZMusic
+        run: |
+          cd libraries/ZMusic || cd zmusic
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make -j$(nproc)
+          sudo make install
+          sudo ldconfig
+
+      - name: Build LZDoom
         run: |
           mkdir build && cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
